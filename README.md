@@ -61,3 +61,11 @@ Fehlen die Secrets, zeigt das Formular eine Fehlermeldung und sendet nichts.
 pnpm preview   # OpenNext-Build lokal auf dem Workers-Runtime
 pnpm deploy
 ```
+
+Wichtig: immer über `pnpm deploy` (bzw. `opennextjs-cloudflare deploy`)
+ausrollen, nicht über `wrangler deploy`. Die vorgerenderten Seiten, auch die
+Fahrzeugseiten aus `generateStaticParams`, liegen nicht als HTML im
+Assets-Ordner, sondern werden vom Worker aus dem Incremental Cache gelesen.
+`open-next.config.ts` verwendet dafür den Static-Assets-Cache; `deploy` und
+`preview` füllen ihn automatisch (`populateCache`). Fehlt dieser Schritt,
+antworten die Fahrzeugseiten mit 404.
