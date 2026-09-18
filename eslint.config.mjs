@@ -54,7 +54,7 @@ const eslintConfig = defineConfig([
             'no-useless-catch': ['error'],
             'no-useless-escape': ['error'],
             'no-with': ['error'],
-            quotes: ['error', 'single'],
+            quotes: ['error', 'single', { avoidEscape: true }],
             'require-await': ['warn'],
             'require-yield': ['error'],
             semi: ['error'],

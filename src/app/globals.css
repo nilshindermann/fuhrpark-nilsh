@@ -1,26 +1,155 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
+
+/* No dark mode: the dark: variants of the shadcn primitives only apply with a
+   .dark class that is never set, not via prefers-color-scheme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   Fuhrpark: design tokens as shadcn/ui variables
+   Source: design/tokens.json (design system "Fuhrpark", v1)
+
+   Light theme only. There is deliberately no dark mode and no `destructive`;
+   both get decided in the design system before they are needed.
+--------------------------------------------------------------------------- */
 
 :root {
-    --background: #ffffff;
-    --foreground: #171717;
+    /* Surfaces */
+    --background: #f7faf8; /* surface */
+    --foreground: #16201a; /* ink */
+    --card: #ffffff; /* surface-raised */
+    --card-foreground: #16201a;
+    --popover: #ffffff;
+    --popover-foreground: #16201a;
+
+    /* Actions: brand is a fill colour, never a text colour.
+       Text on brand stays ink (dark), never white. */
+    --primary: #66da66; /* brand */
+    --primary-foreground: #16201a; /* ink */
+    --secondary: #ffffff;
+    --secondary-foreground: #16201a;
+
+    /* Subdued */
+    --muted: #f7faf8;
+    --muted-foreground: #5c6b61; /* ink-muted */
+    --accent: #f7faf8;
+    --accent-foreground: #167c36; /* brand-text */
+
+    /* Lines and focus */
+    --border: #cbd8d0; /* border: subtle divider, not a functional edge */
+    --input: #cbd8d0;
+    --ring: #167c36; /* brand-text: carries enough contrast */
+
+    /* Corners: rounded, never fully round. No pill radius. */
+    --radius: 10px; /* radius-md, default for buttons and inputs */
+    --radius-sm: 6px; /* badges, tags */
+    --radius-md: 10px;
+    --radius-lg: 16px; /* cards and panels */
+
+    /* Extra token without a shadcn equivalent:
+       green text, links, icons and focus rings on surface / surface-raised */
+    --brand-text: #167c36;
+
+    --font-sans: var(--font-inter), 'Inter', system-ui, sans-serif;
 }
 
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
-    --font-sans: var(--font-geist-sans);
-    --font-mono: var(--font-geist-mono);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-brand-text: var(--brand-text);
+
+    /* rounded-sm | rounded-md | rounded-lg yield exactly the design radii. */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+
+    --font-sans: var(--font-sans);
+
+    /* Spacing space-1 to space-4 (4/8/16/24px) maps 1:1 to the Tailwind
+       steps 1, 2, 4 and 6, so no custom tokens are needed.
+       Card padding is space-3 (p-4), gap between cards space-4 (gap-6). */
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+    body {
+        @apply bg-background text-foreground font-sans antialiased;
     }
 }
 
-body {
-    background: var(--background);
-    color: var(--foreground);
-    font-family: Arial, Helvetica, sans-serif;
+/* ---------------------------------------------------------------------------
+   Typography: Inter throughout.
+   Exposed as utility classes so text styles are named in markup instead of
+   rebuilt: <h2 className="text-heading-lg"> instead of text-[22px] leading-[30px].
+--------------------------------------------------------------------------- */
+
+@layer components {
+    .text-heading-xl {
+        font-size: 30px;
+        line-height: 38px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+    }
+    .text-heading-lg {
+        font-size: 22px;
+        line-height: 30px;
+        font-weight: 600;
+    }
+    .text-heading-md {
+        font-size: 18px;
+        line-height: 26px;
+        font-weight: 600;
+    }
+    .text-body {
+        font-size: 15px;
+        line-height: 22px;
+        font-weight: 400;
+    }
+    .text-body-sm {
+        font-size: 13px;
+        line-height: 20px;
+        font-weight: 400;
+    }
+    .text-label {
+        font-size: 13px;
+        line-height: 16px;
+        font-weight: 500;
+    }
+    .text-caption {
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 400;
+    }
+
+    /* The only permitted exception beyond heading-xl:
+       the hero heading of the landing page (AGENTS.md, section Schrift). */
+    .text-hero {
+        font-size: 34px;
+        line-height: 42px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+    @media (width >= 64rem) {
+        .text-hero {
+            font-size: 52px;
+            line-height: 60px;
+        }
+    }
 }

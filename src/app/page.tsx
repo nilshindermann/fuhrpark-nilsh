@@ -1,70 +1,145 @@
-import Image from 'next/image';
+import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { Container } from '@/components/container';
+import { SectionHeading } from '@/components/section-heading';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { VehicleCard } from '@/components/vehicle-card';
+import { formatDate } from '@/lib/format';
+import { site } from '@/lib/site';
+import { vehicles, vehiclesForSale, vehiclesInStock } from '@/lib/vehicles';
+
+const heroTitle = 'Fünf Volkswagen, Baujahr 1991 bis 2025.';
+const heroLead =
+    'Drei Golf aus den frühen Neunzigern, ein Tiguan von 2012 und ein Golf eTSI von 2025. Zu jedem Fahrzeug findest du Baujahr, Kilometerstand und Treibstoff. Zwei Fahrzeuge stehen derzeit zum Verkauf.';
 
 export default function Home() {
+    const firstForSale = vehiclesForSale[0];
+
     return (
-        <div className="flex flex-1 flex-col items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-            <main className="flex w-full max-w-3xl flex-1 flex-col items-center justify-between bg-white px-16 py-32 sm:items-start dark:bg-black">
-                <Image
-                    className="h-5 w-[100px] dark:invert"
-                    src="/next.svg"
-                    alt="Next.js logo"
-                    width={100}
-                    height={20}
-                    priority
-                />
-                <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-                    <h1 className="max-w-xs text-3xl leading-10 font-semibold tracking-tight text-black dark:text-zinc-50">
-                        To get started, edit the{' '}
-                        <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-                            page.tsx
-                        </code>{' '}
-                        file.
-                    </h1>
-                    <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-                        Looking for a starting point or more instructions? Head
-                        over to{' '}
-                        <a
-                            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                            className="font-medium text-zinc-950 dark:text-zinc-50"
-                        >
-                            Templates
-                        </a>{' '}
-                        or the{' '}
-                        <a
-                            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                            className="font-medium text-zinc-950 dark:text-zinc-50"
-                        >
-                            Learning
-                        </a>{' '}
-                        center.
-                    </p>
-                </div>
-                <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-                    <a
-                        className="bg-foreground text-background flex h-12 w-full items-center justify-center gap-2 rounded-full px-5 transition-colors hover:bg-[#383838] md:w-[158px] dark:hover:bg-[#ccc]"
-                        href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        <Image
-                            className="h-[14px] w-4 dark:invert"
-                            src="/vercel.svg"
-                            alt="Vercel logomark"
-                            width={16}
-                            height={14}
+        <>
+            <section className="pt-10 pb-12 lg:pt-26 lg:pb-24">
+                <Container>
+                    <div className="flex max-w-[820px] flex-col gap-4 lg:gap-6">
+                        <span className="text-label text-brand-text tracking-[0.08em] uppercase">
+                            Privater Fuhrpark
+                        </span>
+                        <h1 className="text-hero text-pretty">{heroTitle}</h1>
+                        <p className="text-body text-muted-foreground max-w-[680px] text-pretty">
+                            {heroLead}
+                        </p>
+                        <div className="text-body-sm text-muted-foreground flex flex-wrap items-center gap-2">
+                            <span>{vehicles.length} Fahrzeuge</span>
+                            <span aria-hidden="true">·</span>
+                            <span>{vehiclesForSale.length} zu verkaufen</span>
+                            <span aria-hidden="true">·</span>
+                            <span>Stand {formatDate(site.lastUpdated)}</span>
+                        </div>
+                        <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+                            {vehiclesForSale.length > 0 && (
+                                <Button asChild size="xl">
+                                    <Link href="#verkauf">
+                                        Fahrzeuge zum Verkauf
+                                        <ArrowRight
+                                            className="size-[18px]"
+                                            aria-hidden="true"
+                                        />
+                                    </Link>
+                                </Button>
+                            )}
+                            <Button asChild size="xl" variant="outline">
+                                <Link href="#bestand">Ganzer Fuhrpark</Link>
+                            </Button>
+                        </div>
+                    </div>
+                </Container>
+            </section>
+
+            {vehiclesForSale.length > 0 && (
+                <section
+                    id="verkauf"
+                    aria-labelledby="verkauf-titel"
+                    className="scroll-mt-6 pb-12 lg:pb-22"
+                >
+                    <Container className="flex flex-col gap-5 lg:gap-8">
+                        <SectionHeading
+                            id="verkauf-titel"
+                            title="Zu verkaufen"
+                            description="Preis und Zustand stehen direkt beim Fahrzeug, alles Weitere auf der Detailseite."
                         />
-                        Deploy Now
-                    </a>
-                    <a
-                        className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] md:w-[158px] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
-                        href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Documentation
-                    </a>
-                </div>
-            </main>
-        </div>
+                        <div className="grid gap-4 md:grid-cols-2 md:gap-6">
+                            {vehiclesForSale.map((vehicle, i) => (
+                                <VehicleCard
+                                    key={vehicle.slug}
+                                    vehicle={vehicle}
+                                    priority={i === 0}
+                                />
+                            ))}
+                        </div>
+                    </Container>
+                </section>
+            )}
+
+            {vehiclesInStock.length > 0 && (
+                <section
+                    id="bestand"
+                    aria-labelledby="bestand-titel"
+                    className="scroll-mt-6 pb-12 lg:pb-22"
+                >
+                    <Container className="flex flex-col gap-5 lg:gap-8">
+                        <SectionHeading
+                            id="bestand-titel"
+                            title="Im Bestand"
+                            description="Fahrzeuge, die bleiben."
+                        />
+                        <div className="grid gap-4 md:grid-cols-3 md:gap-6">
+                            {vehiclesInStock.map((vehicle) => (
+                                <VehicleCard
+                                    key={vehicle.slug}
+                                    vehicle={vehicle}
+                                />
+                            ))}
+                        </div>
+                    </Container>
+                </section>
+            )}
+
+            <section
+                id="kontakt"
+                aria-labelledby="kontakt-titel"
+                className="scroll-mt-6 pb-12 lg:pb-24"
+            >
+                <Container>
+                    <Card className="flex-col gap-4 p-6 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:p-10">
+                        <div className="flex max-w-[640px] flex-col gap-2">
+                            <h2
+                                id="kontakt-titel"
+                                className="text-heading-lg lg:text-heading-xl"
+                            >
+                                Fragen zu einem Fahrzeug?
+                            </h2>
+                            <p className="text-body text-muted-foreground">
+                                Schreib mir, was du wissen willst: Zustand,
+                                Serviceheft, Besichtigung. Anfragen laufen über
+                                das Formular auf der Fahrzeugseite.
+                            </p>
+                        </div>
+                        {firstForSale && (
+                            <Button asChild size="xl" className="shrink-0">
+                                <Link
+                                    href={`/fahrzeuge/${firstForSale.slug}#anfrage`}
+                                >
+                                    Anfrage senden
+                                    <ArrowRight
+                                        className="size-[18px]"
+                                        aria-hidden="true"
+                                    />
+                                </Link>
+                            </Button>
+                        )}
+                    </Card>
+                </Container>
+            </section>
+        </>
     );
 }

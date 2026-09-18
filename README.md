@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Fuhrpark
 
-## Getting Started
+Private Website, die meine Fahrzeuge zeigt. Fahrzeuge zum Verkauf bekommen
+Preis, Zustand und ein Kontaktformular.
 
-First, run the development server:
+Stack: Next.js 16 (App Router), React 19, Tailwind v4, shadcn/ui, TypeScript.
+Deployment auf Cloudflare Workers via OpenNext. Die Regeln für Code und
+Gestaltung stehen in `AGENTS.md`, das Design system in `src/design/`.
+
+## Entwicklung
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev          # http://localhost:3000
+pnpm lint
+pnpm format
+pnpm build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Inhalte pflegen
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Fahrzeuge: `src/lib/vehicles.ts` (`forSale` schaltet das Verkaufs-UI).
+- Fotos: Dateien unter `public/` ablegen und in `photos` eintragen, erstes
+  Bild ist das Hauptfoto.
+- Angaben zur Website (Ort, öffentliche E-Mail, Name fürs Impressum, Stand):
+  `src/lib/site.ts`. Leere Felder werden nicht gerendert.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Kontaktformular
 
-## Learn More
+Die Anfrage wird in einer Server Action via [Resend](https://resend.com)
+verschickt. Dafür braucht es drei Secrets:
 
-To learn more about Next.js, take a look at the following resources:
+| Variable         | Bedeutung                                             |
+| ---------------- | ----------------------------------------------------- |
+| `RESEND_API_KEY` | API-Key aus dem Resend-Dashboard                      |
+| `CONTACT_TO`     | Empfängeradresse (deine Mailbox)                      |
+| `CONTACT_FROM`   | Absender, z. B. `Fuhrpark <fuhrpark@deine-domain.ch>` |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Lokal in `.dev.vars` ablegen (ist in `.gitignore`):
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+RESEND_API_KEY=re_...
+CONTACT_TO=du@example.ch
+CONTACT_FROM=Fuhrpark <fuhrpark@example.ch>
+```
 
-## Deploy on Vercel
+Für Produktion einmalig setzen:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+wrangler secret put RESEND_API_KEY
+wrangler secret put CONTACT_TO
+wrangler secret put CONTACT_FROM
+pnpm cf-typegen
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Fehlen die Secrets, zeigt das Formular eine Fehlermeldung und sendet nichts.
+
+## Deployment
+
+```bash
+pnpm preview   # OpenNext-Build lokal auf dem Workers-Runtime
+pnpm deploy
+```
