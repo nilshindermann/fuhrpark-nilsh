@@ -1,16 +1,15 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-/* No dark mode: the dark: variants of the shadcn primitives only apply with a
-   .dark class that is never set, not via prefers-color-scheme. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ---------------------------------------------------------------------------
    Fuhrpark: design tokens as shadcn/ui variables
-   Source: design/tokens.json (design system "Fuhrpark", v1)
+   Source: design/tokens.json (design system "Fuhrpark")
 
-   Light theme only. There is deliberately no dark mode and no `destructive`;
-   both get decided in the design system before they are needed.
+   Light and dark mode are both defined (AGENTS.md). There is deliberately
+   no toggle UI yet, since none of the drafts show one — but the tokens are
+   complete, so a switcher can be wired up easily later.
 --------------------------------------------------------------------------- */
 
 :root {
@@ -23,9 +22,9 @@
     --popover-foreground: #16201a;
 
     /* Actions: brand is a fill colour, never a text colour.
-       Text on brand stays ink (dark), never white. */
-    --primary: #66da66; /* brand */
-    --primary-foreground: #16201a; /* ink */
+       Text on brand is on-brand: dark green, never ink and never white. */
+    --primary: #66da66; /* brand — same in light and dark */
+    --primary-foreground: #12241a; /* on-brand — same in light and dark */
     --secondary: #ffffff;
     --secondary-foreground: #16201a;
 
@@ -41,16 +40,46 @@
     --ring: #167c36; /* brand-text: carries enough contrast */
 
     /* Corners: rounded, never fully round. No pill radius. */
-    --radius: 10px; /* radius-md, default for buttons and inputs */
-    --radius-sm: 6px; /* badges, tags */
-    --radius-md: 10px;
-    --radius-lg: 16px; /* cards and panels */
+    --radius: 8px; /* radius-md, default for buttons and inputs */
+    --radius-sm: 4px; /* radius-sm: badges, tags */
+    --radius-md: 8px;
+    --radius-lg: 12px; /* radius-lg: cards and panels */
 
     /* Extra token without a shadcn equivalent:
        green text, links, icons and focus rings on surface / surface-raised */
     --brand-text: #167c36;
 
     --font-sans: var(--font-inter), 'Inter', system-ui, sans-serif;
+
+    /* Uniform aspect ratio for vehicle photos in cards, galleries and
+       thumbnails. Do NOT use in the fullscreen view — there the photo
+       keeps its original format. */
+    --photo-ratio: 3 / 2;
+}
+
+.dark {
+    --background: #12160f;
+    --foreground: #eaf2ec;
+    --card: #1b221c; /* lighter than surface, so cards stand out */
+    --card-foreground: #eaf2ec;
+    --popover: #1b221c;
+    --popover-foreground: #eaf2ec;
+
+    --primary: #66da66; /* stays equally light */
+    --primary-foreground: #12241a; /* stays equally dark */
+    --secondary: #1b221c;
+    --secondary-foreground: #eaf2ec;
+
+    --muted: #1b221c;
+    --muted-foreground: #9fb0a6;
+    --accent: #1b221c;
+    --accent-foreground: #4fbf63;
+
+    --border: #2a332c;
+    --input: #2a332c;
+    --ring: #4fbf63;
+
+    --brand-text: #4fbf63; /* lighter, so contrast holds on a dark ground */
 }
 
 @theme inline {
@@ -74,11 +103,13 @@
     --color-brand-text: var(--brand-text);
 
     /* rounded-sm | rounded-md | rounded-lg yield exactly the design radii. */
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 16px;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
 
     --font-sans: var(--font-sans);
+
+    --aspect-photo: var(--photo-ratio);
 
     /* Spacing space-1 to space-4 (4/8/16/24px) maps 1:1 to the Tailwind
        steps 1, 2, 4 and 6, so no custom tokens are needed.

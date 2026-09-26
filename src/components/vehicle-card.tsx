@@ -19,15 +19,11 @@ export function VehicleCard({ vehicle, priority }: Props) {
     return (
         <Card className="gap-0 py-0">
             <VehiclePhoto
-                src={vehicle.photos[0]}
+                photo={vehicle.photos[0]}
                 alt={title}
                 priority={priority}
                 sizes="(min-width: 1024px) 560px, 100vw"
-                className={
-                    vehicle.forSale
-                        ? 'h-50 border-b lg:h-65'
-                        : 'h-40 border-b lg:h-50'
-                }
+                className="aspect-photo w-full border-b"
             />
             <div className="flex flex-col gap-2 p-4">
                 <div className="flex">

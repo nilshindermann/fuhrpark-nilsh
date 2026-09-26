@@ -1,13 +1,3 @@
-<!-- BEGIN:nextjs-agent-rules -->
-
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->
-
 # Fuhrpark
 
 Private Website, die meine Fahrzeuge zeigt. Fahrzeuge, die zum Verkauf stehen,
@@ -23,34 +13,52 @@ shadcn-Variablen in `app/globals.css`, die Quelle daneben in
 shadcn-Primitives — keine eigenen Hexwerte, keine eigenen Radien, keine
 eigenen Schriftgrössen.
 
-In `design/` liegen ausserdem vier statische HTML-Entwürfe (Landingpage und
-Detailseite, je Desktop und Mobile). Sie sind die visuelle Vorlage für Layout,
-Abstände und Hierarchie — **nicht** zum Übernehmen: die Inline-Styles dort sind
-Artefakt des Entwurfstools. Im Code wird das mit shadcn und Tailwind gebaut.
+In `design/` liegen ausserdem sechs statische HTML-Entwürfe (Landingpage
+Desktop und Mobile, Detailseite eines Verkaufsfahrzeugs Desktop und Mobile,
+Detailseite eines Bestandsfahrzeugs, Foto-Vollbild). Sie sind die visuelle
+Vorlage für Layout, Abstände und Hierarchie — **nicht** zum Übernehmen: die
+Inline-Styles dort sind Artefakt des Entwurfstools. Im Code wird das mit shadcn
+und Tailwind gebaut.
 
 ### Farben
 
 - Seitenhintergrund ist `background` (surface), Karten und Panels sind `card`
-  (surface-raised).
+  (surface-raised) — im Dunkelmodus etwas heller als der Hintergrund, damit sie
+  sich abheben.
 - Fliesstext und Titel in `foreground` (ink), Metadaten und Hilfetext in
   `muted-foreground` (ink-muted).
 - `primary` (#66DA66) ist **Füllfarbe** für Buttons, aktive Zustände und
-  Akzente — nie Textfarbe, der Kontrast reicht nicht.
-- Text auf einer `primary`-Fläche ist `foreground` (dunkel), **nie weiss**.
-- Für grünen Text, Links, Icons und Fokusringe gibt es `brand-text` (#167C36).
+  Akzente — nie Textfarbe, der Kontrast reicht nicht. Die Füllung bleibt in
+  Hell und Dunkel gleich hell.
+- Text auf einer `primary`-Fläche ist `primary-foreground` (on-brand, #12241A) —
+  **nicht `foreground` und nicht weiss**, in beiden Modi gleich dunkel.
+- Für grünen Text, Links, Icons und Fokusringe gibt es `brand-text` — im
+  Hellmodus dunkelgrün, im Dunkelmodus heller.
 - `border` ist eine dezente Trennlinie für Karten und Listen, kein funktionaler
   Rand. Interaktive Ränder und Fokusringe nutzen `brand-text` / `ring`.
-- Kein Dark Mode. Wenn einer dazukommt, wird er im Design system definiert,
-  nicht hier erfunden.
+- **Hell- und Dunkelmodus sind beide definiert.** Jede Komponente muss in
+  beiden funktionieren: nur Tokens verwenden, nie eine Farbe hart schreiben.
 
 ### Form und Abstand
 
-- Ecken gerundet, aber nie voll rund: `radius-sm` (6px) für Badges und Tags,
-  `radius-md` (10px) für Buttons und Inputs, `radius-lg` (16px) für Karten und
+- Ecken gerundet, aber knapp: `rounded-sm` (4px) für Badges und Tags,
+  `rounded-md` (8px) für Buttons und Inputs, `rounded-lg` (12px) für Karten und
   Panels. **Kein Element bekommt einen Pill-Radius.**
 - Abstände 4/8/16/24px. Kartenpadding 16px, Abstand zwischen Karten 24px.
 - Gruppen von Elementen mit flex/grid und `gap` layouten, nicht mit Margins
   pro Kind.
+
+### Fotos
+
+- **In Karten, Galerien und Thumbnails haben alle Fotos dasselbe
+  Seitenverhältnis: 3:2** (`aspect-photo` bzw. `--photo-ratio`), über
+  `aspect-ratio` und `object-fit: cover` — nie über fixe Pixelhöhen, damit die
+  Fläche mit der Spaltenbreite mitwächst und über alle Seiten gleich aussieht.
+- **Im Vollbild gilt das nicht**: dort behält das Foto sein Originalformat,
+  auch Hochformat. Es wird eingepasst (`object-fit: contain`), nie
+  beschnitten, auf dunklem Grund. Dafür trägt jedes `Photo` seine echten
+  `width`/`height` mit.
+- Bilder mit `rounded-lg`, keine eigene Umrandung.
 
 ### Schrift
 
@@ -74,7 +82,7 @@ buntes Icon-Set. **Keine Emojis in der Oberfläche.**
   "Ihre Fahrzeuge".
 - Kurz und sachlich, keine Marketing-Sprache. Ein Status heisst "Bereit" oder
   "Service fällig", nicht "Alles im grünen Bereich!".
-- Zahlen und Daten in Schweizer Formatierung: 12'450 km, 18.09.2026, CHF 89.–.
+- Zahlen und Daten in Schweizer Formatierung: 12'450 km, 26.09.2026, CHF 89.–.
   Dafür gibt es `lib/format.ts` — Zahlen nie von Hand formatieren.
 - Keine erfundenen Fahrzeugdaten. Fehlt eine Angabe (Getriebe, Farbe, MFK,
   Ausstattung), bleibt das Feld leer und der Abschnitt wird nicht gerendert —
@@ -84,14 +92,18 @@ buntes Icon-Set. **Keine Emojis in der Oberfläche.**
 
 `lib/vehicles.ts` hält Typ und Bestand. `forSale` ist der einzige Schalter, der
 das Verkaufs-UI steuert: Badge, Preisblock, Preis-Panel und Kontaktformular auf
-der Detailseite. Fahrzeuge ohne `forSale` zeigen nichts davon.
+der Detailseite. Bestandsfahrzeuge haben ein eigenes Detail-Layout — Galerie
+über die ganze Breite, darunter Eckdaten und Ausstattung nebeneinander — und
+eine ruhige Zeile "Dieses Fahrzeug steht nicht zum Verkauf".
 
 ## Arbeitsweise
 
 - Vor einer neuen Komponente prüfen, ob shadcn sie schon hat (Card, Badge,
-  Button, Input, Form, Carousel …). Eigene Komponenten sind Zusammenbauten
-  daraus, keine Neuimplementierungen.
+  Button, Input, Form, Carousel, Dialog …). Eigene Komponenten sind
+  Zusammenbauten daraus, keine Neuimplementierungen.
 - Zugänglichkeit ist nicht optional: echte `<button>`, `<a href>`, `<input>` mit
-  `<label>`, `aria-label` auf Icon-Buttons, Touch-Ziele mindestens 44px.
+  `<label>`, `aria-label` auf Icon-Buttons, Touch-Ziele mindestens 44px. Das
+  Vollbild braucht Fokusfalle, Escape zum Schliessen und Pfeiltasten zum
+  Blättern.
 - Kleine Änderungen bleiben klein — nicht ungefragt umbauen, was nicht Teil der
   Aufgabe ist.

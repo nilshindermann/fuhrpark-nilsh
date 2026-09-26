@@ -1,5 +1,6 @@
 'use client';
 
+import { Expand } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import {
@@ -10,19 +11,23 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from '@/components/ui/carousel';
+import { PhotoLightbox } from '@/components/photo-lightbox';
 import { VehiclePhoto } from '@/components/vehicle-photo';
 import { cn } from '@/lib/utils';
+import type { Photo } from '@/lib/vehicles';
 
 type Props = {
-    photos: string[];
+    photos: Photo[];
     alt: string;
 };
 
-const mainClass = 'h-60 w-full rounded-lg border bg-card lg:h-105';
+const mainClass = 'aspect-photo w-full rounded-lg border bg-card';
 
 export function PhotoGallery({ photos, alt }: Props) {
     const [api, setApi] = useState<CarouselApi>();
     const [current, setCurrent] = useState(0);
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
 
     useEffect(() => {
         if (!api) {
@@ -40,19 +45,38 @@ export function PhotoGallery({ photos, alt }: Props) {
         return <VehiclePhoto alt={alt} className={mainClass} />;
     }
 
+    const openLightbox = (index: number) => {
+        setLightboxIndex(index);
+        setLightboxOpen(true);
+    };
+
     return (
         <div className="flex flex-col gap-3 lg:gap-4">
             <Carousel setApi={setApi} className="w-full">
                 <CarouselContent>
-                    {photos.map((src, i) => (
-                        <CarouselItem key={src}>
-                            <VehiclePhoto
-                                src={src}
-                                alt={`${alt}, Foto ${i + 1} von ${photos.length}`}
-                                priority={i === 0}
-                                sizes="(min-width: 1024px) 668px, 100vw"
-                                className={mainClass}
-                            />
+                    {photos.map((photo, i) => (
+                        <CarouselItem key={photo.src}>
+                            <button
+                                type="button"
+                                onClick={() => openLightbox(i)}
+                                aria-label="Fotos im Vollbild öffnen"
+                                className="focus-visible:ring-ring/50 group relative block w-full outline-none focus-visible:ring-3"
+                            >
+                                <VehiclePhoto
+                                    photo={photo}
+                                    alt={`${alt}, Foto ${i + 1} von ${photos.length}`}
+                                    priority={i === 0}
+                                    sizes="(min-width: 1024px) 668px, 100vw"
+                                    className={mainClass}
+                                />
+                                <span className="bg-card/90 text-body-sm text-brand-text absolute right-3 bottom-3 flex items-center gap-1 rounded-md px-2 py-1">
+                                    <Expand
+                                        className="size-4"
+                                        aria-hidden="true"
+                                    />
+                                    Vollbild
+                                </span>
+                            </button>
                         </CarouselItem>
                     ))}
                 </CarouselContent>
@@ -72,20 +96,20 @@ export function PhotoGallery({ photos, alt }: Props) {
 
             {photos.length > 1 && (
                 <div className="grid grid-cols-3 gap-3 lg:gap-4">
-                    {photos.map((src, i) => (
+                    {photos.map((photo, i) => (
                         <button
-                            key={src}
+                            key={photo.src}
                             type="button"
                             onClick={() => api?.scrollTo(i)}
                             aria-label={`Foto ${i + 1} anzeigen`}
                             aria-current={i === current ? 'true' : undefined}
                             className={cn(
-                                'bg-card focus-visible:ring-ring/50 relative h-20 overflow-hidden rounded-lg border outline-none focus-visible:ring-3 lg:h-30',
+                                'bg-card focus-visible:ring-ring/50 aspect-photo relative w-full overflow-hidden rounded-lg border outline-none focus-visible:ring-3',
                                 i === current && 'border-brand-text',
                             )}
                         >
                             <Image
-                                src={src}
+                                src={photo.src}
                                 alt=""
                                 fill
                                 sizes="(min-width: 1024px) 212px, 33vw"
@@ -95,6 +119,15 @@ export function PhotoGallery({ photos, alt }: Props) {
                     ))}
                 </div>
             )}
+
+            <PhotoLightbox
+                photos={photos}
+                alt={alt}
+                index={lightboxIndex}
+                onIndexChange={setLightboxIndex}
+                open={lightboxOpen}
+                onOpenChange={setLightboxOpen}
+            />
         </div>
     );
 }

@@ -1,9 +1,11 @@
 import { Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import type { Photo } from '@/lib/vehicles';
 
 type Props = {
-    src?: string;
+    photo?: Photo;
+    /** Alt text for the placeholder area when no photo is available. */
     alt: string;
     /** Load the first visible image of the page with priority. */
     priority?: boolean;
@@ -16,13 +18,13 @@ type Props = {
  * with an icon. No placeholder text (AGENTS.md).
  */
 export function VehiclePhoto({
-    src,
+    photo,
     alt,
     priority,
     sizes = '100vw',
     className,
 }: Props) {
-    if (!src) {
+    if (!photo) {
         return (
             <div
                 role="img"
@@ -43,8 +45,8 @@ export function VehiclePhoto({
     return (
         <div className={cn('relative overflow-hidden', className)}>
             <Image
-                src={src}
-                alt={alt}
+                src={photo.src}
+                alt={photo.alt || alt}
                 fill
                 sizes={sizes}
                 priority={priority}
